@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+  cas0:
+    hostname: cas0
+    networks:
+        mynet:
+          ipv4_address: 172.25.0.101
+    image: spotify/cassandra:cluster
+    command: /bin/bash -c "sleep 1 && echo 'cas0' && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - CASSANDRA_TOKEN=-9223372036854775808
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+
+  cas1:
+    hostname: cas1
+    networks:
+        mynet:
+          ipv4_address: 172.25.0.102
+    image: spotify/cassandra:cluster
+    command: /bin/bash -c "sleep 30 && echo 'cas1' && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - CASSANDRA_TOKEN=-3074457345618258603
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cas0
+    links:
+      - cas0
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24
